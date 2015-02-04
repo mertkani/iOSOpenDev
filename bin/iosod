@@ -754,7 +754,7 @@ function createTarForDebianPackage() # args: sourceDir, outputDir, tarName [, op
 	
 	pushd "$sourceDir" 1> /dev/null
 
-	tar -cLpz --disable-copyfile --exclude ".*" "$@" -f "$outputDir/$tarName.tar.gz" * || \
+	gtar -cpz --exclude ".*" "$@" -f "$outputDir/$tarName.tar.gz" * || \
 		panic $? "Failed to create $tarName archive"
 
 	popd 1> /dev/null
