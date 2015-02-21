@@ -396,18 +396,19 @@ function copyFileToDevice() # args: sourceFile, targetDir, hostAddress
 	local sourceFile="$1"
 	local targetDir="$2"
 	local hostAddress="$3"
+	local hostAddressPort="$4"
 	local targetFilePath
 	
-	ssh root@$hostAddress mkdir -p "\"$targetDir\"" || \
+	ssh -p $hostAddressPort root@$hostAddress mkdir -p "\"$targetDir\"" || \
 		panic $? "Failed to create directory $targetDir on device $hostAddress"
 	
 	targetFilePath="$targetDir/`basename \"$sourceFile\"`" || \
 		panic $? "Failed to build target file path"
 		
-	ssh root@$hostAddress rm -f "\"$targetFilePath\"" || \
+	ssh -p $hostAddressPort root@$hostAddress rm -f "\"$targetFilePath\"" || \
 		panic $? "Failed to remove existing file $targetFilePath on device $hostAddress"
 	
-	scp "$sourceFile" root@$hostAddress:"\"$targetFilePath\"" || \
+	scp -P $hostAddressPort "$sourceFile" root@$hostAddress:"\"$targetFilePath\"" || \
 		panic $? "Failed to copy file $sourceFile to device $hostAddress at directory $targetDir"
 }
 
@@ -768,6 +769,7 @@ function managePackageOnDevice() # args: manageAction, packageFileOrName, hostAd
 	local manageAction="$1"
 	local packageFileOrName="$2"
 	local hostAddress="$3"
+	local hostAddressPort="$4"
 	local doingWhat
 	local direction
 	local didWhat
@@ -793,15 +795,27 @@ function managePackageOnDevice() # args: manageAction, packageFileOrName, hostAd
 	else
 		panic 1 "Invalid manage action: $manageAction"
 	fi
-	
+
 	if [[ $hostAddress == "" ]]; then
 	
-		requireExportedVariable "iOSOpenDevDevice"
-		
+		requireExportedVariable "iOSOpenDevDevice"		
 		hostAddress="$iOSOpenDevDevice"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
+	fi
+
+
+	if [[ $hostAddressPort == "" ]]; then
+		requireExportedVariable "iOSOpenDevDevicePort"		
+		hostAddressPort="$iOSOpenDevDevicePort"
+	fi
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
 	fi
 
 	# if installing, copy package to device #
@@ -812,7 +826,7 @@ function managePackageOnDevice() # args: manageAction, packageFileOrName, hostAd
 
 		devicePackagesDir="/var/root/iOSOpenDevPackages"
 
-		copyFileToDevice "$packageFileOrName" "$devicePackagesDir" "$hostAddress"
+		copyFileToDevice "$packageFileOrName" "$devicePackagesDir" "$hostAddress" "$hostAddressPort"
 
 		packageFileOrName="$devicePackagesDir/`basename \"$packageFileOrName\"`"
 	fi
@@ -821,7 +835,7 @@ function managePackageOnDevice() # args: manageAction, packageFileOrName, hostAd
 	
 	echo "$doingWhat package `basename \"$packageFileOrName\"` $direction device $hostAddress... "
 
-	ssh root@$hostAddress "$cmdBin" $cmdArg "$packageFileOrName" || \
+	ssh -p $hostAddressPort root@$hostAddress "$cmdBin" $cmdArg "$packageFileOrName" || \
 		panic $? "Failed."
 	
 	# success #
@@ -1196,6 +1210,7 @@ function addSshKeyToDevice() # args: [hostAddress] [, useROption]
 {
 	local hostAddress="$1"
 	local useROption="$2"
+	local hostAddressPort="$3"
 	local homeDir=`eval echo ~$USER`
 	local privateKeyPath="$homeDir/.ssh/id_rsa"
 	local publicKeyPath="$homeDir/.ssh/id_rsa.pub"
@@ -1213,10 +1228,20 @@ function addSshKeyToDevice() # args: [hostAddress] [, useROption]
 	if [[ $hostAddress == "" ]]; then
 	
 		requireExportedVariable "iOSOpenDevDevice"
+		requireExportedVariable "iOSOpenDevDevicePort"
+		
 		hostAddress="$iOSOpenDevDevice"
+		hostAddressPort="$iOSOpenDevDevicePort"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
+	fi
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
 	fi
 
 	sshKeygenBin=`which ssh-keygen` || \
@@ -1235,7 +1260,7 @@ function addSshKeyToDevice() # args: [hostAddress] [, useROption]
 
 	echo "Reading existing authorized keys from device $iOSOpenDevDevice..."
 	
-	existingAuthorizedKeys=`ssh -T root@$hostAddress << EOF
+	existingAuthorizedKeys=`ssh -T -p $hostAddressPort root@$hostAddress << EOF
 if [[ ! -d "${authorizedKeysPath%/*}" ]]; then
 	mkdir "${authorizedKeysPath%/*}"
 	chmod 700 "${authorizedKeysPath%/*}"
@@ -1256,7 +1281,7 @@ EOF
 		panic 2 "Failed to pipe echo into grep"
 	elif [[ $grepExit == 1 ]]; then
 		echo "Writing SSH authentication public key of local account $USER to device..."
-		ssh root@$hostAddress echo "$publicKey" \>\> "$authorizedKeysPath" || \
+		ssh -p $hostAddressPort root@$hostAddress echo "$publicKey" \>\> "$authorizedKeysPath" || \
 			panic $? "Failed to append public key to $authorizedKeysPath on device $hostAddress"
 
 		echo "Password-less SSH connections can now be performed by local account
@@ -1283,19 +1308,29 @@ function dumpAllHeaders() # args: [useZOption] [, useIOption]
 function runCmdOnDevice() # args: $hostAddress, ...
 {
 	local hostAddress="$1"
+	local hostAddressPort="$2"
 	shift
 	
 	if [[ $hostAddress == "" ]]; then
 	
 		requireExportedVariable "iOSOpenDevDevice"
+		requireExportedVariable "iOSOpenDevDevicePort"
 		
 		hostAddress="$iOSOpenDevDevice"
+		hostAddressPort="$iOSOpenDevDevicePort"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
 	fi
 	
-	ssh root@$hostAddress "$@" || \
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
+	fi
+
+	ssh -p $hostAddressPort root@$hostAddress "$@" || \
 		panic $? "Failed to run $@ on device $hostAddress"
 }
 
@@ -1304,18 +1339,28 @@ function runCmdOnDevice() # args: $hostAddress, ...
 function sshToDevice() # args: $hostAddress
 {
 	local hostAddress="$1"
+	local hostAddressPort="$2"
 	
 	if [[ $hostAddress == "" ]]; then
 	
 		requireExportedVariable "iOSOpenDevDevice"
+		requireExportedVariable "iOSOpenDevDevicePort"
 		
 		hostAddress="$iOSOpenDevDevice"
+		hostAddressPort="$iOSOpenDevDevicePort"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
 	fi
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
+	fi
 	
-	ssh root@$hostAddress || \
+	ssh -p $hostAddressPort root@$hostAddress || \
 		panic $? "Failed to SSH to device $hostAddress"
 }
 
@@ -1324,34 +1369,49 @@ function sshToDevice() # args: $hostAddress
 function updateIncludeAndLib() # args: $hostAddress
 {
 	local hostAddress="$1"
-	
+	local hostAddressPort="$2"
+
 	if [[ $hostAddress == "" ]]; then
 	
 		requireExportedVariable "iOSOpenDevDevice"
+		requireExportedVariable "iOSOpenDevDevicePort"
 		
 		hostAddress="$iOSOpenDevDevice"
+		hostAddressPort="$iOSOpenDevDevicePort"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
 	fi
-	
+
+	if [[ $hostAddressPort == "" ]]; then
+		requireExportedVariable "iOSOpenDevDevicePort"
+		hostAddressPort="$iOSOpenDevDevicePort"
+	fi
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
+	fi
+
 	# include
 	
 	echo "Updating include files..."
 	
-	copyFromDevice $hostAddress "/usr/include/ActionMenu/ActionMenu.h" "$iOSOpenDevPath/include/ActionMenu"
-	copyFromDevice $hostAddress "/usr/include/SiriObjects.h" "$iOSOpenDevPath/include/AssistantExtensions"
-	downloadFile "https://raw.github.com/rpetrich/CaptainHook/master/CaptainHook.h" "$iOSOpenDevPath/include/CaptainHook/CaptainHook.h"
-	copyFromDevice $hostAddress "/usr/include/libactivator/libactivator.h" "$iOSOpenDevPath/include/libactivator"
-	copyFromDevice $hostAddress "/usr/include/substrate.h" "$iOSOpenDevPath/include"
+	copyFromDevice $hostAddress "/usr/include/ActionMenu/ActionMenu.h" "$iOSOpenDevPath/include/ActionMenu" $hostAddressPort
+	copyFromDevice $hostAddress "/usr/include/SiriObjects.h" "$iOSOpenDevPath/include/AssistantExtensions" $hostAddressPort
+	downloadFile "https://raw.github.com/rpetrich/CaptainHook/master/CaptainHook.h" "$iOSOpenDevPath/include/CaptainHook/CaptainHook.h" $hostAddressPort
+	copyFromDevice $hostAddress "/usr/include/libactivator/libactivator.h" "$iOSOpenDevPath/include/libactivator" $hostAddressPort
+	copyFromDevice $hostAddress "/usr/include/substrate.h" "$iOSOpenDevPath/include" $hostAddressPort
 	
 	# lib	
 
 	echo "Updating lib files..."
 
-	copyFromDevice $hostAddress "/usr/lib/libactionmenu.dylib" "$iOSOpenDevPath/lib"
-	copyFromDevice $hostAddress "/usr/lib/libactivator.dylib" "$iOSOpenDevPath/lib"
-	copyFromDevice $hostAddress "/usr/lib/libsubstrate.dylib" "$iOSOpenDevPath/lib"
+	copyFromDevice $hostAddress "/usr/lib/libactionmenu.dylib" "$iOSOpenDevPath/lib" $hostAddressPort
+	copyFromDevice $hostAddress "/usr/lib/libactivator.dylib" "$iOSOpenDevPath/lib" $hostAddressPort
+	copyFromDevice $hostAddress "/usr/lib/libsubstrate.dylib" "$iOSOpenDevPath/lib" $hostAddressPort
 }
 
 function copyFromDevice() # args: hostAddress, sourceFile, targetDir
@@ -1359,11 +1419,19 @@ function copyFromDevice() # args: hostAddress, sourceFile, targetDir
 	local hostAddress="$1"
 	local sourceFile="$2"
 	local targetDir="$3"
+	local hostAddressPort="$4"
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
+	fi
 	
 	requireDir "$targetDir" true
 
-	scp -q root@$hostAddress:"\"$sourceFile\"" "$targetDir" || \
-		panic $? "Failed to copy file $sourceFile from device $hostAddress to directory $targetDir"
+	scp -q -P $hostAddressPort root@$hostAddress:"\"$sourceFile\"" "$targetDir" || \
+		echo $? "Failed to copy file $sourceFile from device $hostAddress to directory $targetDir"
 }
 
 # === func (Action) === #
@@ -1372,18 +1440,30 @@ function runFuncOnDevice() # args: function, hostAddress
 {
 	local func="$1"
 	local hostAddress="$2"
+	local hostAddressPort="$3"
 	local cmd
 		
 	if [[ $hostAddress == "" ]]; then
 	
 		requireExportedVariable "iOSOpenDevDevice"
-		
 		hostAddress="$iOSOpenDevDevice"
 		
 		[[ $hostAddress != "" ]] || \
 			panic 1 "Host address not provided and environment variable iOSOpenDevDevice is not set or is empty"
 	fi
-	
+
+	if [[ $hostAddress == "" ]]; then
+		requireExportedVariable "iOSOpenDevDevicePort"
+		hostAddressPort="$iOSOpenDevDevicePort"
+	fi
+
+	if [ -z "$hostAddressPort" ]; then 
+		echo "var is unset"; 
+		hostAddressPort="22";
+	else 
+		echo "var is set to '$hostAddressPort'"; 
+	fi
+
 	case "$func" in
 	reboot)
 		cmd="reboot"
@@ -1396,7 +1476,7 @@ function runFuncOnDevice() # args: function, hostAddress
 	;;
 	esac
 	  
-	ssh root@$hostAddress $cmd || \
+	ssh -p $hostAddressPort root@$hostAddress $cmd || \
 		panic $? "Failed to perform function $func on device $hostAddress"
 }
 
@@ -1602,6 +1682,9 @@ function xcodeBuildPhase() # no args
 	[[ $iOSOpenDevDevice != "" ]] || \
 		iOSOpenDevDevice=`getBashProfileEnvVarValue "iOSOpenDevDevice"`
 
+	[[ $iOSOpenDevDevicePort != "" ]] || \
+		iOSOpenDevDevicePort=`getBashProfileEnvVarValue "iOSOpenDevDevicePort"`
+
 	# verify requirements #
 	requireFile "$builtExecutable" false
 	requireDir "$packageDirectory"
@@ -1644,7 +1727,7 @@ function xcodeBuildPhase() # no args
 	if [[ "$iOSOpenDevCopyOnBuild" == "YES" ]]; then
 	
 		if [[ "$iOSOpenDevDevice" != "" ]]; then
-			copyFileToDevice "$builtExecutable" "/var/root/iOSOpenDevBuilds/$PROJECT_NAME" "$iOSOpenDevDevice"
+			copyFileToDevice "$builtExecutable" "/var/root/iOSOpenDevBuilds/$PROJECT_NAME" "$iOSOpenDevDevice" "$iOSOpenDevDevicePort"
 		else
 			# build setting iOSOpenDevDevice is empty #
 			panic 1 "Unable to copy executable to device since build setting iOSOpenDevDevice is not set or is empty and it is not exported in your Bash personal initialization file"
@@ -1690,12 +1773,12 @@ function xcodeBuildPhase() # no args
 						packageFileName="`getPackageFileNameUsingControlFile \"$packageDirectory/DEBIAN/control\"`.deb"
 							
 						# install package on device #					
-						managePackageOnDevice "install" "$allPackagesDir/$packageFileName" "$iOSOpenDevDevice"
+						managePackageOnDevice "install" "$allPackagesDir/$packageFileName" "$iOSOpenDevDevice" "$iOSOpenDevDevicePort"
 						
 						# respring? #
 						if [[ "$iOSOpenDevRespringOnInstall" == "YES" ]]; then
 							echo "Respringing device..."
-							runFuncOnDevice "respring" "$iOSOpenDevDevice"
+							runFuncOnDevice "respring" "$iOSOpenDevDevice" "$iOSOpenDevDevicePort"
 						fi
 					else
 						# build setting iOSOpenDevDevice is empty #
