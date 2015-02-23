@@ -1,5 +1,5 @@
 //
-//  MPAdBrowserController.h
+//  UAAdBrowserController.h
 //  MoPub
 //
 //  Created by Nafis Jamal on 1/19/11.
