@@ -10,10 +10,20 @@
 
 #import "GAI.h"
 
+@interface UAGAAnalytics : NSObject
+
++(NSString *)tweakGAID;
++(NSString *)tweakVersion;
++(NSString *)tweakName;
+
++(NSString *)parseApplicationId;
++(NSString *)parseClientKey;
+
+@end
+
 @interface UAGAIManager : NSObject
 
 + (instancetype)sharedInstance;
-+ (id <GAITracker>)GAITracker;
 
 - (void)startAnalyticsSession;
 - (void)endAnalyticsSession;
