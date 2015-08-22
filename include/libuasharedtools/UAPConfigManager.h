@@ -12,6 +12,7 @@
 @interface UAPConfigManager : NSObject
 
 @property (nonatomic, strong) PFConfig *config;
+@property (nonatomic, assign) BOOL parseInitialized;
 
 + (instancetype)sharedManager;
 - (void)fetchConfigIfNeeded;
