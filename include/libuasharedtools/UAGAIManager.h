@@ -15,6 +15,7 @@
 +(NSString *)tweakGAID;
 +(NSString *)tweakVersion;
 +(NSString *)tweakName;
++(NSString *)tweakPackageId;
 
 +(NSString *)parseApplicationId;
 +(NSString *)parseClientKey;

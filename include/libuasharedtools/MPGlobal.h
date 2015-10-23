@@ -69,7 +69,7 @@ typedef NSUInteger MPInterstitialOrientationType;
 /*
  * Returns string with reserved/unsafe characters encoded.
  */
-- (NSString *)URLEncodedString;
+- (NSString *)mp_URLEncodedString;
 
 @end
 
