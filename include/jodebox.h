@@ -9,14 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface CPDistributedMessagingCenter : NSObject
-+ (id)centerNamed:(id)arg1;
-- (void)runServerOnCurrentThread;
-- (void)registerForMessageName:(id)arg1 target:(id)arg2 selector:(SEL)arg3;
-- (BOOL)sendMessageName:(id)arg1 userInfo:(id)arg2;
-- (NSDictionary*)sendMessageAndReceiveReplyName:(NSString*)name userInfo:(NSDictionary*)info;
-@end
-
 typedef enum {
     kSong,
     kMusicVideo,
@@ -25,13 +17,29 @@ typedef enum {
     kPodcast
 } MediaType;
 
-@interface JODeBox : NSObject
+@interface JODebox : NSObject
 
 +(NSDictionary *)importMediaType:(MediaType)type withUserInfo:(NSDictionary *)info;
 
+/*
+ albumName = TestingAlbum;
+ trackNumber = 1;
+ */
+
+
 +(NSDictionary *)importSongWithTitle:(NSString *)title artist:(NSString *)artist image:(UIImage *)image
-                  duration:(NSNumber *)duration year:(NSNumber *)year path:(NSString *)path;
+                           albumName:(NSString *)albumName trackNumber:(NSNumber *)trackNumber
+                            duration:(NSNumber *)duration year:(NSNumber *)year path:(NSString *)path genre:(NSString *)genre;
 
 +(NSDictionary *)importMusicVideoWithTitle:(NSString *)title artist:(NSString *)artist image:(UIImage *)image
-                                  duration:(NSNumber *)duration year:(NSNumber *)year path:(NSString *)path;
+                                  duration:(NSNumber *)duration year:(NSNumber *)year path:(NSString *)path genre:(NSString *)genre;
+
++(NSDictionary *)importMovieWithTitle:(NSString *)title artist:(NSString *)artist image:(UIImage *)image
+                                  duration:(NSNumber *)duration year:(NSNumber *)year path:(NSString *)path genre:(NSString *)genre;
+
++(NSDictionary *)importTVEpisodeWithTitle:(NSString *)title artist:(NSString *)artist
+                                    image:(UIImage *)image duration:(NSNumber *)duration
+                                     year:(NSNumber *)year seriesName:(NSString *)seriesName
+                             seasonNumber:(NSNumber *)seasonNumber episodeNumber:(NSNumber *)episodeNumber
+                                     path:(NSString *)path genre:(NSString *)genre;
 @end
