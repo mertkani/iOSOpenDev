@@ -15,6 +15,10 @@
 @end
 
 @interface UAPPLoginPaymentHandler : NSObject
+
+@property (nonatomic, strong) NSString *tweakName;
+@property (nonatomic, strong) NSString *tweakPrice;
+
 - (instancetype)initWithTweakName:(NSString *)tweakName
                        tweakPrice:(NSString *)tweakPrice
                        paypalKeys:(NSDictionary *)paypalKeys
