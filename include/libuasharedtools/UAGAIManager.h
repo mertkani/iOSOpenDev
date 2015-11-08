@@ -13,6 +13,7 @@
 @interface UAGAAnalytics : NSObject
 
 +(NSString *)tweakGAID;
++(NSString *)tweakFabricAPIKey;
 +(NSString *)tweakVersion;
 +(NSString *)tweakName;
 +(NSString *)tweakPackageId;
