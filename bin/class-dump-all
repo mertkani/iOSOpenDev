@@ -1,0 +1,18 @@
+#!/bin/bash
+
+INPUT=$1
+OUTPUT=$2
+
+POSSIBLE_ARCHS=$(file $1)
+
+if [[ $POSSIBLE_ARCHS == *"armv7"* ]] 
+then
+  echo "It's there armv7!";
+  /opt/iOSOpenDev/bin/class-dump -H --arch armv7 -o "$OUTPUT/armv7" "$INPUT"
+fi
+
+if [[ $POSSIBLE_ARCHS == *"arm64"* ]] 
+then
+  echo "It's there arm64!";
+  /opt/iOSOpenDev/bin/class-dump -H --arch arm64 -o "$OUTPUT/arm64" "$INPUT"
+fi
