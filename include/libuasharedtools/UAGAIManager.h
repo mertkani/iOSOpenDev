@@ -21,6 +21,10 @@
 +(NSString *)parseApplicationId;
 +(NSString *)parseClientKey;
 
++(BOOL)showTwitterMessageOnLoad;
++(NSString *)twitterHandle;
++(NSString *)twitterMessage;
+
 @end
 
 @interface UAGAIManager : NSObject

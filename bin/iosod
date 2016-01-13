@@ -695,27 +695,6 @@ function buildPackage() # args: packageDir, outputDir, versionPList [, useZOptio
 	# create package #
 
 	createDebianPackage "$packageDir" "$packageName" "$outputDir"
-	
-	# create zip #
-	
-	if [[ $useZOption == "true" ]]; then
-
-		zipFileName="$outputDir/${packageName}.zip"
-
-		echo -n "Creating zip $zipFileName... "
-		
-		rm -f "$zipFileName" || \
-			panic $? "Failed to remove $zipFileName"
-		
-		pushd "$packageDir" 1> /dev/null
-		
-		zip -qrX "$zipFileName" * || \
-			panic $? "Failed."
-
-		popd 1> /dev/null
-		
-		echo "Done."
-	fi
 }
 
 function createDebianPackage() # args: sourceDir, packageName [, outputDir]
