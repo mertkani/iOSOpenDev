@@ -10,4 +10,5 @@
 
 @interface UARemoteMessageManager : NSObject
 + (instancetype)sharedInstance;
++ (BOOL)isTweakInstalledAtPath:(NSString *)path;
 @end
