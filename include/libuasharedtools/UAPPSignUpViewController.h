@@ -6,9 +6,8 @@
 //
 //
 
-#import <Parse/Parse.h>
-#import <ParseUI/ParseUI.h>
+#import "UAPSignUpViewController.h"
 
-@interface UAPPSignUpViewController : PFSignUpViewController
+@interface UAPPSignUpViewController : UAPSignUpViewController
 -(instancetype)initWithTweakName:(NSString *)tweakName;
 @end

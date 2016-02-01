@@ -18,10 +18,14 @@
 
 @property (nonatomic, strong) NSString *tweakName;
 @property (nonatomic, strong) NSString *tweakPrice;
+@property (nonatomic, strong) NSString *suitePrice;
 
 - (instancetype)initWithTweakName:(NSString *)tweakName
                        tweakPrice:(NSString *)tweakPrice
                        paypalKeys:(NSDictionary *)paypalKeys
                          delegate:(id <UAPPLoginPaymentHandlerDelegate>)delegate;
-- (void)loginAndPurchaseAdRemoval;
+
+- (void)presentLoginSignupController;
+- (void)presentAdRemovalPaymentViewIfNeeded:(BOOL)full;
+
 @end
