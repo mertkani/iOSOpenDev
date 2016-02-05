@@ -26,6 +26,8 @@
 + (UAPUser *)currentUser;
 + (void)logOut;
 + (void)update:(UAPUserResultBlock)block;
++ (void)updatePassword:(NSString *)password
+                 block:(UAPBooleanResultBlock)block;
 + (void)requestPasswordResetForEmailInBackground:(NSString *)email
                                            block:(UAPBooleanResultBlock)block;
 + (void)signUpInBackground:(NSDictionary *)params
