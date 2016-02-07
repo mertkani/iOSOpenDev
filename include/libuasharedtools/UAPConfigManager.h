@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Parse/PFConfig.h>
 #import <UAJSONModel.h>
 
 @class UAPConfig;

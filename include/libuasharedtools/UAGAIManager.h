@@ -18,9 +18,6 @@
 +(NSString *)tweakName;
 +(NSString *)tweakPackageId;
 
-+(NSString *)parseApplicationId;
-+(NSString *)parseClientKey;
-
 +(BOOL)showTwitterMessageOnLoad;
 +(NSString *)twitterHandle;
 +(NSString *)twitterMessage;
