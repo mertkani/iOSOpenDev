@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface uasharedtools : NSObject
-
+@interface UASharedTools : NSObject
++(void)initializeUAClassesAndMethods;
 @end

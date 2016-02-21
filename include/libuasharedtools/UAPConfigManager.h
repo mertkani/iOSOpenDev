@@ -46,10 +46,14 @@ typedef void(^UAPConfigResultBlock)(UAPConfig *config, NSError *error);
 
 + (instancetype)sharedManager;
 - (void)fetchConfigIfNeeded;
+- (void)forceFetchConfig;
 
 - (BOOL)mainViewAdsEnabled;
 - (BOOL)fsAdsEnabled;
 
 - (double)adRefreshTimeout;
 - (BOOL)forceLoadBannerAds;
+
+- (NSString *)jsPatchCommonString;
+- (NSString *)jsPatchString;
 @end
