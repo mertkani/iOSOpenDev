@@ -11,4 +11,6 @@
 @interface UAStartupManager : NSObject
 +(void)startCrashManagerIfNeeded;
 +(BOOL)shouldLoadHooks;
++(void)resetNumberOfCrashes;
++(void)addExceptionHandlers;
 @end
