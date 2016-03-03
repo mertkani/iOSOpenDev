@@ -6,18 +6,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MPActivityViewControllerHelper+TweetShare.h"
 #import "MPURLResolver.h"
 #import "MPProgressOverlayView.h"
-#import "UAAdBrowserController.h"
+#import "MPAdBrowserController.h"
 #import "MPStoreKitProvider.h"
 
 @protocol MPAdDestinationDisplayAgentDelegate;
 
-@interface MPAdDestinationDisplayAgent : NSObject <MPURLResolverDelegate, MPProgressOverlayViewDelegate, UAAdBrowserControllerDelegate, MPSKStoreProductViewControllerDelegate>
+@interface MPAdDestinationDisplayAgent : NSObject <MPProgressOverlayViewDelegate,
+                                                   MPAdBrowserControllerDelegate,
+                                                   MPSKStoreProductViewControllerDelegate,
+                                                   MPActivityViewControllerHelperDelegate>
 
-@property (nonatomic, weak) id <MPAdDestinationDisplayAgentDelegate> delegate;
+@property (nonatomic, weak) id<MPAdDestinationDisplayAgentDelegate> delegate;
 
-+ (MPAdDestinationDisplayAgent *)agentWithDelegate:(id <MPAdDestinationDisplayAgentDelegate> )delegate;
++ (MPAdDestinationDisplayAgent *)agentWithDelegate:(id<MPAdDestinationDisplayAgentDelegate>)delegate;
 - (void)displayDestinationForURL:(NSURL *)URL;
 - (void)cancel;
 
@@ -29,5 +33,9 @@
 - (void)displayAgentWillPresentModal;
 - (void)displayAgentWillLeaveApplication;
 - (void)displayAgentDidDismissModal;
+
+@optional
+
+- (MPAdConfiguration *)adConfiguration;
 
 @end

@@ -9,23 +9,31 @@
 #import "MPCoreInstanceProvider.h"
 
 // Banners
-@class UABannerAdManager;
-@protocol UABannerAdManagerDelegate;
-@class UABaseBannerAdapter;
+@class MPBannerAdManager;
+@protocol MPBannerAdManagerDelegate;
+@class MPBaseBannerAdapter;
 @protocol MPBannerAdapterDelegate;
-@class UABannerCustomEvent;
-@protocol UABannerCustomEventDelegate;
+@class MPBannerCustomEvent;
+@protocol MPBannerCustomEventDelegate;
 
 // Interstitials
 @class MPInterstitialAdManager;
 @protocol MPInterstitialAdManagerDelegate;
 @class MPBaseInterstitialAdapter;
 @protocol MPInterstitialAdapterDelegate;
-@class UAInterstitialCustomEvent;
-@protocol UAInterstitialCustomEventDelegate;
-@class UAHTMLInterstitialViewController;
-@class UAMRAIDInterstitialViewController;
+@class MPInterstitialCustomEvent;
+@protocol MPInterstitialCustomEventDelegate;
+@class MPHTMLInterstitialViewController;
+@class MPMRAIDInterstitialViewController;
 @protocol MPInterstitialViewControllerDelegate;
+
+// Rewarded Video
+@class MPRewardedVideoAdManager;
+@class MPRewardedVideoAdapter;
+@class MPRewardedVideoCustomEvent;
+@protocol MPRewardedVideoAdapterDelegate;
+@protocol MPRewardedVideoCustomEventDelegate;
+@protocol MPRewardedVideoAdManagerDelegate;
 
 // HTML Ads
 @class MPAdWebView;
@@ -64,61 +72,67 @@
 @class MPStreamAdPlacementData;
 @class MPStreamAdPlacer;
 @class MPAdPositioning;
+@protocol MPNativeAdRenderer;
 
 @interface MPInstanceProvider : NSObject
 
-+ (instancetype)sharedProvider;
++(instancetype)sharedProvider;
 - (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider;
+- (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider context:(id)context;
 
 #pragma mark - Banners
-- (UABannerAdManager *)buildMPBannerAdManagerWithDelegate:(id <UABannerAdManagerDelegate> )delegate;
-- (UABaseBannerAdapter *)buildBannerAdapterForConfiguration:(UAAdConfiguration *)configuration
-                                                   delegate:(id <MPBannerAdapterDelegate> )delegate;
-- (UABannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
-                                                      delegate:(id <UABannerCustomEventDelegate> )delegate;
+- (MPBannerAdManager *)buildMPBannerAdManagerWithDelegate:(id<MPBannerAdManagerDelegate>)delegate;
+- (MPBaseBannerAdapter *)buildBannerAdapterForConfiguration:(MPAdConfiguration *)configuration
+                                                   delegate:(id<MPBannerAdapterDelegate>)delegate;
+- (MPBannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
+                                                      delegate:(id<MPBannerCustomEventDelegate>)delegate;
 
 #pragma mark - Interstitials
-- (MPInterstitialAdManager *)buildMPInterstitialAdManagerWithDelegate:(id <MPInterstitialAdManagerDelegate> )delegate;
-- (MPBaseInterstitialAdapter *)buildInterstitialAdapterForConfiguration:(UAAdConfiguration *)configuration
-                                                               delegate:(id <MPInterstitialAdapterDelegate> )delegate;
-- (UAInterstitialCustomEvent *)buildInterstitialCustomEventFromCustomClass:(Class)customClass
-                                                                  delegate:(id <UAInterstitialCustomEventDelegate> )delegate;
-- (UAHTMLInterstitialViewController *)buildMPHTMLInterstitialViewControllerWithDelegate:(id <MPInterstitialViewControllerDelegate> )delegate
-                                                                        orientationType:(MPInterstitialOrientationType)type
-                                                                   customMethodDelegate:(id)customMethodDelegate;
-- (UAMRAIDInterstitialViewController *)buildMPMRAIDInterstitialViewControllerWithDelegate:(id <MPInterstitialViewControllerDelegate> )delegate
-                                                                            configuration:(UAAdConfiguration *)configuration;
+- (MPInterstitialAdManager *)buildMPInterstitialAdManagerWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
+- (MPBaseInterstitialAdapter *)buildInterstitialAdapterForConfiguration:(MPAdConfiguration *)configuration
+                                                               delegate:(id<MPInterstitialAdapterDelegate>)delegate;
+- (MPInterstitialCustomEvent *)buildInterstitialCustomEventFromCustomClass:(Class)customClass
+                                                                  delegate:(id<MPInterstitialCustomEventDelegate>)delegate;
+- (MPHTMLInterstitialViewController *)buildMPHTMLInterstitialViewControllerWithDelegate:(id<MPInterstitialViewControllerDelegate>)delegate
+                                                                        orientationType:(MPInterstitialOrientationType)type;
+- (MPMRAIDInterstitialViewController *)buildMPMRAIDInterstitialViewControllerWithDelegate:(id<MPInterstitialViewControllerDelegate>)delegate
+                                                                            configuration:(MPAdConfiguration *)configuration;
+
+#pragma mark - Rewarded Video
+- (MPRewardedVideoAdManager *)buildRewardedVideoAdManagerWithAdUnitID:(NSString *)adUnitID delegate:(id<MPRewardedVideoAdManagerDelegate>)delegate;
+- (MPRewardedVideoAdapter *)buildRewardedVideoAdapterWithDelegate:(id<MPRewardedVideoAdapterDelegate>)delegate;
+- (MPRewardedVideoCustomEvent *)buildRewardedVideoCustomEventFromCustomClass:(Class)customClass delegate:(id<MPRewardedVideoCustomEventDelegate>)delegate;
+
 
 #pragma mark - HTML Ads
 - (MPAdWebView *)buildMPAdWebViewWithFrame:(CGRect)frame
-                                  delegate:(id <UIWebViewDelegate> )delegate;
+                                  delegate:(id<UIWebViewDelegate>)delegate;
 - (MPAdWebViewAgent *)buildMPAdWebViewAgentWithAdWebViewFrame:(CGRect)frame
-                                                     delegate:(id <MPAdWebViewAgentDelegate> )delegate
-                                         customMethodDelegate:(id)customMethodDelegate;
+                                                     delegate:(id<MPAdWebViewAgentDelegate>)delegate;
 
 #pragma mark - MRAID
-- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(UIWebView *)webView delegate:(id <MPClosableViewDelegate> )delegate;
+- (MPClosableView *)buildMRAIDMPClosableViewWithFrame:(CGRect)frame webView:(UIWebView *)webView delegate:(id<MPClosableViewDelegate>)delegate;
 - (MRBundleManager *)buildMRBundleManager;
-- (MRController *)buildBannerMRControllerWithFrame:(CGRect)frame delegate:(id <MRControllerDelegate> )delegate;
-- (MRController *)buildInterstitialMRControllerWithFrame:(CGRect)frame delegate:(id <MRControllerDelegate> )delegate;
-- (MRBridge *)buildMRBridgeWithWebView:(UIWebView *)webView delegate:(id <MRBridgeDelegate> )delegate;
+- (MRController *)buildBannerMRControllerWithFrame:(CGRect)frame delegate:(id<MRControllerDelegate>)delegate;
+- (MRController *)buildInterstitialMRControllerWithFrame:(CGRect)frame delegate:(id<MRControllerDelegate>)delegate;
+- (MRBridge *)buildMRBridgeWithWebView:(UIWebView *)webView delegate:(id<MRBridgeDelegate>)delegate;
 - (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame;
-- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id <MRCalendarManagerDelegate> )delegate;
-- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id <EKEventEditViewDelegate> )editViewDelegate;
+- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate;
+- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate;
 - (EKEventStore *)buildEKEventStore;
-- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id <MRPictureManagerDelegate> )delegate;
-- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id <MRImageDownloaderDelegate> )delegate;
-- (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id <MRVideoPlayerManagerDelegate> )delegate;
+- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id<MRPictureManagerDelegate>)delegate;
+- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id<MRImageDownloaderDelegate>)delegate;
+- (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id<MRVideoPlayerManagerDelegate>)delegate;
 - (MPMoviePlayerViewController *)buildMPMoviePlayerViewControllerWithURL:(NSURL *)URL;
-- (MRNativeCommandHandler *)buildMRNativeCommandHandlerWithDelegate:(id <MRNativeCommandHandlerDelegate> )delegate;
+- (MRNativeCommandHandler *)buildMRNativeCommandHandlerWithDelegate:(id<MRNativeCommandHandlerDelegate>)delegate;
 
 #pragma mark - Native
 
 - (MPNativeCustomEvent *)buildNativeCustomEventFromCustomClass:(Class)customClass
-                                                      delegate:(id <MPNativeCustomEventDelegate> )delegate;
-- (MPNativeAdSource *)buildNativeAdSourceWithDelegate:(id <MPNativeAdSourceDelegate> )delegate;
+                                                      delegate:(id<MPNativeCustomEventDelegate>)delegate;
+- (MPNativeAdSource *)buildNativeAdSourceWithDelegate:(id<MPNativeAdSourceDelegate>)delegate;
 - (MPNativePositionSource *)buildNativePositioningSource;
 - (MPStreamAdPlacementData *)buildStreamAdPlacementDataWithPositioning:(MPAdPositioning *)positioning;
-- (MPStreamAdPlacer *)buildStreamAdPlacerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning defaultAdRenderingClass:defaultAdRenderingClass;
+- (MPStreamAdPlacer *)buildStreamAdPlacerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning rendererConfigurations:(NSArray *)rendererConfigurations;
 
 @end

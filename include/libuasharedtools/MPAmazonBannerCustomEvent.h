@@ -5,12 +5,12 @@
 //  Copyright (c) 2014 Idemfactor Solutions. All rights reserved.
 //
 
-#import "UABannerCustomEvent.h"
+#import "MPBannerCustomEvent.h"
 #import <AmazonAd/AmazonAdView.h>
 
 /*
  */
 
-@interface MPAmazonBannerCustomEvent : UABannerCustomEvent <AmazonAdViewDelegate>
+@interface MPAmazonBannerCustomEvent : MPBannerCustomEvent <AmazonAdViewDelegate>
 
 @end

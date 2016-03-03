@@ -5,12 +5,12 @@
 //  Copyright (c) 2014 Idemfactor Solutions Inc. All rights reserved.
 //
 
-#import "UAInterstitialCustomEvent.h"
+#import "MPInterstitialCustomEvent.h"
 #import <AmazonAd/AmazonAdInterstitial.h>
 
 /*
  */
 
-@interface MPAmazonInterstitialCustomEvent : UAInterstitialCustomEvent <AmazonAdInterstitialDelegate>
+@interface MPAmazonInterstitialCustomEvent : MPInterstitialCustomEvent <AmazonAdInterstitialDelegate>
 
 @end
