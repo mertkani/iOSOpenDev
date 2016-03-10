@@ -7,23 +7,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "UAAdConfiguration.h"
+#import "MPAdConfiguration.h"
 #import "MPGlobal.h"
 
 @protocol MPAdServerCommunicatorDelegate;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_5_0
 @interface MPAdServerCommunicator : NSObject <NSURLConnectionDataDelegate>
-#else
-@interface MPAdServerCommunicator : NSObject
-#endif
 
-@property (nonatomic, weak) id <MPAdServerCommunicatorDelegate> delegate;
+@property (nonatomic, weak) id<MPAdServerCommunicatorDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL loading;
 
-- (id)initWithDelegate:(id <MPAdServerCommunicatorDelegate> )delegate;
+- (id)initWithDelegate:(id<MPAdServerCommunicatorDelegate>)delegate;
 
 - (void)loadURL:(NSURL *)URL;
 - (void)cancel;
@@ -35,7 +31,7 @@
 @protocol MPAdServerCommunicatorDelegate <NSObject>
 
 @required
-- (void)communicatorDidReceiveAdConfiguration:(UAAdConfiguration *)configuration;
+- (void)communicatorDidReceiveAdConfiguration:(MPAdConfiguration *)configuration;
 - (void)communicatorDidFailWithError:(NSError *)error;
 
 @end

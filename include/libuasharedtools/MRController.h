@@ -8,10 +8,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import "MRConstants.h"
-#import "UAMRAIDInterstitialViewController.h"
+#import "MPMRAIDInterstitialViewController.h"
 
 @protocol MRControllerDelegate;
-@class UAAdConfiguration;
+@class MPAdConfiguration;
 @class CLLocation;
 
 /**
@@ -22,12 +22,12 @@
  */
 @interface MRController : NSObject
 
-@property (nonatomic, weak) id <MRControllerDelegate> delegate;
+@property (nonatomic, weak) id<MRControllerDelegate> delegate;
 
 - (instancetype)initWithAdViewFrame:(CGRect)adViewFrame adPlacementType:(MRAdViewPlacementType)placementType;
 
-- (void)loadAdWithConfiguration:(UAAdConfiguration *)configuration;
-- (void)handleMRAIDInterstitialDidPresentWithViewController:(UAMRAIDInterstitialViewController *)viewController;
+- (void)loadAdWithConfiguration:(MPAdConfiguration *)configuration;
+- (void)handleMRAIDInterstitialDidPresentWithViewController:(MPMRAIDInterstitialViewController *)viewController;
 - (void)enableRequestHandling;
 - (void)disableRequestHandling;
 
@@ -44,7 +44,7 @@
 @required
 
 - (NSString *)adUnitId;
-- (UAAdConfiguration *)adConfiguration;
+- (MPAdConfiguration *)adConfiguration;
 - (CLLocation *)location;
 
 // Retrieves the view controller from which modal views should be presented.

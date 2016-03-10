@@ -7,17 +7,16 @@
 
 #import <Foundation/Foundation.h>
 
-@class UAAdView;
-@protocol UAAdViewDelegate;
+@class MPAdView;
+@protocol MPAdViewDelegate;
 
-@protocol UABannerAdManagerDelegate <NSObject>
+@protocol MPBannerAdManagerDelegate <NSObject>
 
 - (NSString *)adUnitId;
-- (UANativeAdOrientation)allowedNativeAdsOrientation;
-- (UAAdView *)banner;
-- (id <UAAdViewDelegate> )bannerDelegate;
+- (MPNativeAdOrientation)allowedNativeAdsOrientation;
+- (MPAdView *)banner;
+- (id<MPAdViewDelegate>)bannerDelegate;
 - (CGSize)containerSize;
-- (BOOL)ignoresAutorefresh;
 - (NSString *)keywords;
 - (CLLocation *)location;
 - (BOOL)isTesting;
