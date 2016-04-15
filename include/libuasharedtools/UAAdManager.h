@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UAAdView.h>
 
 #import "UAPConfigManager.h"
+#import <MPAdView.h>
 
 @protocol UAAdManagerProtocol <NSObject>
 @required
@@ -22,7 +22,7 @@
 @interface UAAdManager : NSObject
 
 @property (nonatomic, strong) UIView *adViewContainer;
-@property (nonatomic, strong) UAAdView *adView;
+@property (nonatomic, strong) MPAdView *adView;
 @property (nonatomic, assign) BOOL canReloadAd;
 @property (nonatomic, weak) NSTimer *currentTimer;
 @property (nonatomic, weak) UIViewController <UAAdManagerProtocol> *currentController;

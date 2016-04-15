@@ -22,11 +22,16 @@
 +(NSString *)twitterHandle;
 +(NSString *)twitterMessage;
 
++(BOOL)useFlurry;
++(NSString *)flurryKey;
++(BOOL)sideloadedPPTweak;
+
 @end
 
 @interface UAGAIManager : NSObject
 
 + (instancetype)sharedInstance;
++ (Class)flurryClass;
 
 - (void)startAnalyticsSession;
 - (void)endAnalyticsSession;
