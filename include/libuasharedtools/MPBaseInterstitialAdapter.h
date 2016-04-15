@@ -9,26 +9,26 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@class UAAdConfiguration, CLLocation;
+@class MPAdConfiguration, CLLocation;
 
 @protocol MPInterstitialAdapterDelegate;
 
 @interface MPBaseInterstitialAdapter : NSObject
 
-@property (nonatomic, weak) id <MPInterstitialAdapterDelegate> delegate;
+@property (nonatomic, weak) id<MPInterstitialAdapterDelegate> delegate;
 
 /*
  * Creates an adapter with a reference to an MPInterstitialAdManager.
  */
-- (id)initWithDelegate:(id <MPInterstitialAdapterDelegate> )delegate;
+- (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
 
 /*
  * Sets the adapter's delegate to nil.
  */
 - (void)unregisterDelegate;
 
-- (void)getAdWithConfiguration:(UAAdConfiguration *)configuration;
-- (void)_getAdWithConfiguration:(UAAdConfiguration *)configuration;
+- (void)getAdWithConfiguration:(MPAdConfiguration *)configuration;
+- (void)_getAdWithConfiguration:(MPAdConfiguration *)configuration;
 
 - (void)didStopLoading;
 
@@ -48,11 +48,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@class UAInterstitialAdController;
+@class MPInterstitialAdController;
 
 @protocol MPInterstitialAdapterDelegate
 
-- (UAInterstitialAdController *)interstitialAdController;
+- (MPInterstitialAdController *)interstitialAdController;
 - (id)interstitialDelegate;
 - (CLLocation *)location;
 

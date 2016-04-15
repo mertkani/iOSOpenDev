@@ -16,18 +16,17 @@ typedef NSUInteger MPAdWebViewEvent;
 
 @protocol MPAdWebViewAgentDelegate;
 
-@class UAAdConfiguration;
+@class MPAdConfiguration;
 @class MPAdWebView;
 @class CLLocation;
 
 @interface MPAdWebViewAgent : NSObject <UIWebViewDelegate, MPAdDestinationDisplayAgentDelegate>
 
-@property (nonatomic, weak) id customMethodDelegate;
 @property (nonatomic, strong) MPAdWebView *view;
-@property (nonatomic, weak) id <MPAdWebViewAgentDelegate> delegate;
+@property (nonatomic, weak) id<MPAdWebViewAgentDelegate> delegate;
 
-- (id)initWithAdWebViewFrame:(CGRect)frame delegate:(id <MPAdWebViewAgentDelegate> )delegate customMethodDelegate:(id)customMethodDelegate;
-- (void)loadConfiguration:(UAAdConfiguration *)configuration;
+- (id)initWithAdWebViewFrame:(CGRect)frame delegate:(id<MPAdWebViewAgentDelegate>)delegate;
+- (void)loadConfiguration:(MPAdConfiguration *)configuration;
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation;
 - (void)invokeJavaScriptForEvent:(MPAdWebViewEvent)event;
 - (void)forceRedraw;

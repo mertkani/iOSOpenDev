@@ -7,13 +7,14 @@
 
 #import <Foundation/Foundation.h>
 
-@class UAAdConfiguration;
+@class MPAdConfiguration;
 
 @interface MPAnalyticsTracker : NSObject
 
 + (MPAnalyticsTracker *)tracker;
 
-- (void)trackImpressionForConfiguration:(UAAdConfiguration *)configuration;
-- (void)trackClickForConfiguration:(UAAdConfiguration *)configuration;
+- (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration;
+- (void)trackClickForConfiguration:(MPAdConfiguration *)configuration;
+- (void)sendTrackingRequestForURLs:(NSArray *)URLs;
 
 @end

@@ -8,17 +8,17 @@
 #import <Foundation/Foundation.h>
 
 @class MPInterstitialAdManager;
-@class UAInterstitialAdController;
+@class MPInterstitialAdController;
 @class CLLocation;
 
 @protocol MPInterstitialAdManagerDelegate <NSObject>
 
-- (UAInterstitialAdController *)interstitialAdController;
+- (MPInterstitialAdController *)interstitialAdController;
 - (CLLocation *)location;
 - (id)interstitialDelegate;
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager;
-- (void)                       manager:(MPInterstitialAdManager *)manager
-    didFailToLoadInterstitialWithError:(NSError *)error;
+- (void)manager:(MPInterstitialAdManager *)manager
+didFailToLoadInterstitialWithError:(NSError *)error;
 - (void)managerWillPresentInterstitial:(MPInterstitialAdManager *)manager;
 - (void)managerDidPresentInterstitial:(MPInterstitialAdManager *)manager;
 - (void)managerWillDismissInterstitial:(MPInterstitialAdManager *)manager;
