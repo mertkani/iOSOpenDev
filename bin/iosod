@@ -61,7 +61,7 @@ export ActionNames=( \
 	"UpdateIncludeAndLib" \
 	"DumpSDKHeaders" "CopyHeadersToSDK" "DumpAndCopyHeaders" "RemoveCopiedHeaders" "DumpAllHeaders" \
 	"AddSshKeyToDevice" \
-	"XcodeBuildPhase" "XcodeBuildPhaseLogos" "Help")
+	"XcodeBuildPhase" "XcodeBuildPhaseLogos" "XcodeBuildPhaseLogosInternal" "Help")
 export ActionProperty_ShortArg=0
 export ActionProperty_ShortUsage=1
 export ActionProperty_Options=2
@@ -195,6 +195,10 @@ export Action_RunFuncOnDevice=("func" "[-h host_address] function" "h:" 1 1 runF
             respring, reboot")
 
 export Action_XcodeBuildPhaseLogos=("--xcbp-logos" "" "" 0 0 xcodeBuildPhase_Logos false \
+"        DO NOT USE. For use by Xcode as a Build Phase for projects created from
+        iOSOpenDev templates only.")
+
+export Action_XcodeBuildPhaseLogosInternal=("--xcbp-logos-internal" "" "" 0 0 xcodeBuildPhase_Logos_Internal false \
 "        DO NOT USE. For use by Xcode as a Build Phase for projects created from
         iOSOpenDev templates only.")
 
@@ -1495,6 +1499,137 @@ function doesFileContain() # args: filePath, pattern
 	# return #
 	echo $funcReturn
 }
+#xcodeBuildPhase_Logos_Internal
+function xcodeBuildPhase_Logos_Internal() # no args
+{
+	[[ "$ACTION" == "build" ]] || \
+		panic 1 "For Xcode Build Phase use only"
+	
+	echo "Preparing to run Xcode Build Phase for Logos Processor..."
+
+	# process environment variables
+
+	local pbxProjectFilePath="$PROJECT_FILE_PATH/project.pbxproj"
+	local logosProcessor
+	local projectFileModified=false
+	local projectContainsXmFiles
+	local projectContainsXFiles
+	local lastKnownXmFileTypeNotObjCpp
+	local lastKnownXFileTypeNotObjC
+	local xmFileLangSpecNotObjCpp
+	local xFileLangSpecNotObjC
+	local projectXmFiles
+	local projectXFiles
+	local logosStdErr
+	local logosErr=0
+	
+	# verify use
+	
+	[[ -f "$pbxProjectFilePath" ]] || \
+		panic 1 "Xcode project file not found: $pbxProjectFilePath"
+	
+	logosProcessor=`which logos.pl` || \
+		panic $? "Failed to locate Logos Processor. Is Theos installed? If not, see http://iphonedevwiki.net/index.php/Theos/Getting_Started."
+	
+	# for *.xm project files, set known file-type and language specifications to Objective-C++
+	
+	projectContainsXmFiles=`doesFileContain "$pbxProjectFilePath" '\/\* .+\.xm \*\/ *= *\{.*?isa *= *PBXFileReference\b'`
+	projectContainsXFiles=`doesFileContain "$pbxProjectFilePath" '\/\* .+\.x \*\/ *= *\{.*?isa *= *PBXFileReference\b'`
+	
+	if [[ $projectContainsXmFiles == "true" ]]; then
+	
+		lastKnownXmFileTypeNotObjCpp=`doesFileContain "$pbxProjectFilePath" '\/\* .+\.xm \*\/ *= *\{.*?isa *= *PBXFileReference\b[^\}]*?\blastKnownFileType *= *text\b'`
+	
+		if [[ $lastKnownXmFileTypeNotObjCpp == "true" ]]; then
+			echo "Modifying Xcode project file: setting *.xm file-types to Objective-C++..."
+			
+			perl -i -pe 's/^(.*\/\* .+\.xm \*\/ *= *{.*?isa *= *PBXFileReference\b[^}]*?\blastKnownFileType *= *)[^;]+(.*)$/\1sourcecode.cpp.objcpp\2/g' "$pbxProjectFilePath" || \
+				panic $? "Failed to modify Xcode project file"
+	
+			projectFileModified=true
+		fi
+	
+		xmFileLangSpecNotObjCpp=`perl -ne 'if ($_ =~ /\/\* .+\.xm \*\/ *= *\{.*?isa *= *PBXFileReference\b/ && $_ !~ /\bxcLanguageSpecificationIdentifier *= *xcode\.lang\.objcpp\b/) { print "true"; exit; }' "$pbxProjectFilePath"` || \
+			panic $? "Failed to execute perl on $pbxProjectFilePath"
+	
+		if [[ $xmFileLangSpecNotObjCpp == "true" ]]; then
+			echo "Modifying Xcode project file: setting *.xm language to Objective-C++..."
+			
+			perl -i -pe 'if ($_ =~ /\/\* .+\.xm \*\/ *= *\{.*?isa *= *PBXFileReference\b/ && $_ !~ /\bxcLanguageSpecificationIdentifier *= *xcode\.lang\.objcpp\b/) { s/^(.*\/\* .+\.xm \*\/ *= *{.*?isa *= *PBXFileReference\b[^}]*)(.*)$/\1xcLanguageSpecificationIdentifier = xcode.lang.objcpp; \2/g; }' "$pbxProjectFilePath" || \
+				panic $? "Failed to modify Xcode project file"
+		
+			projectFileModified=true
+		fi
+	fi
+	
+	if [[ $projectContainsXFiles == "true" ]]; then
+	
+		lastKnownXFileTypeNotObjCpp=`doesFileContain "$pbxProjectFilePath" '\/\* .+\.x \*\/ *= *\{.*?isa *= *PBXFileReference\b[^\}]*?\blastKnownFileType *= *text\b'`
+	
+		if [[ $lastKnownXFileTypeNotObjC == "true" ]]; then
+			echo "Modifying Xcode project file: setting *.x file-types to Objective-C..."
+			
+			perl -i -pe 's/^(.*\/\* .+\.x \*\/ *= *{.*?isa *= *PBXFileReference\b[^}]*?\blastKnownFileType *= *)[^;]+(.*)$/\1sourcecode.c.objc\2/g' "$pbxProjectFilePath" || \
+				panic $? "Failed to modify Xcode project file"
+	
+			projectFileModified=true
+		fi
+	
+		xFileLangSpecNotObjC=`perl -ne 'if ($_ =~ /\/\* .+\.x \*\/ *= *\{.*?isa *= *PBXFileReference\b/ && $_ !~ /\bxcLanguageSpecificationIdentifier *= *xcode\.lang\.objc\b/) { print "true"; exit; }' "$pbxProjectFilePath"` || \
+			panic $? "Failed to execute perl on $pbxProjectFilePath"
+	
+		if [[ $xFileLangSpecNotObjC == "true" ]]; then
+			echo "Modifying Xcode project file: setting *.x language to Objective-C..."
+			
+			perl -i -pe 'if ($_ =~ /\/\* .+\.x \*\/ *= *\{.*?isa *= *PBXFileReference\b/ && $_ !~ /\bxcLanguageSpecificationIdentifier *= *xcode\.lang\.objc\b/) { s/^(.*\/\* .+\.x \*\/ *= *{.*?isa *= *PBXFileReference\b[^}]*)(.*)$/\1xcLanguageSpecificationIdentifier = xcode.lang.objc; \2/g; }' "$pbxProjectFilePath" || \
+				panic $? "Failed to modify Xcode project file"
+		
+			projectFileModified=true
+		fi
+	fi
+	
+	if [[ $projectFileModified == "true" ]]; then
+		echo "DON'T WORRY, EVERYTHING IS OK!"
+		echo "The Xcode project file was modified to provide better *.xm & *.x file support."
+		echo "To dismiss this build error, just perform the build again."
+		panic 1
+	fi
+	
+	# for each *.xm project file, use Logos Processor to generate *.mm file
+	
+	projectXmFiles=($(perl -ne 'if ($_ =~ /\/\* (.+\.xm) \*\/ *= *{.*?isa *= *PBXFileReference\b/) { print "$1\n"; }' "$pbxProjectFilePath"))
+	projectXFiles=($(perl -ne 'if ($_ =~ /\/\* (.+\.x) \*\/ *= *{.*?isa *= *PBXFileReference\b/) { print "$1\n"; }' "$pbxProjectFilePath"))
+	
+	for f in "${projectXmFiles[@]}"; do
+		echo "Logos Processor: --config generator=internal $f -> ${f%.*}.mm..."
+
+		logosStdErr=$(("$logosProcessor" --config generator=internal "$PROJECT_DIR/$TARGET_NAME/$f" > "$PROJECT_DIR/$TARGET_NAME/${f%.*}.mm") 2>&1) || \
+			logosErr=$?
+		
+		if [[ $logosErr != 0 ]]; then
+			echo "Failed Logos Processor" >&2
+			echo "Logos Processor outputted:" >&2
+			echo "$logosStdErr" >&2
+			exit $logosErr
+		fi
+		
+	done
+	
+	for f in "${projectXFiles[@]}"; do
+		echo "Logos Processor: --config generator=internal $f -> ${f%.*}.m..."
+
+		logosStdErr=$(("$logosProcessor" --config generator=internal "$PROJECT_DIR/$TARGET_NAME/$f" > "$PROJECT_DIR/$TARGET_NAME/${f%.*}.m") 2>&1) || \
+			panic $? "Failed Logos Processor"
+	
+		[[ $logosStdErr == "" ]] || \
+			panic 1 "Logos Processor outputted: $logosStdErr"
+	done
+
+	echo "Note: If any *.xm or *.x file generated above by the Logos Processor (${projectXmFiles[@]}) is not being compiled below, then you must add it to the Xcode project to be compiled."
+
+	# success #
+	echo "Xcode Build Phase for Logos Processor complete."
+}
 
 function xcodeBuildPhase_Logos() # no args
 {
@@ -1916,6 +2051,9 @@ case "${activeActionArg[$ActionProperty_ShortArg]}" in
 		"${activeActionArg[$ActionProperty_Function]}" "$Opt_h"
 	;;
 	${Action_XcodeBuildPhaseLogos[$ActionProperty_ShortArg]})
+		"${activeActionArg[$ActionProperty_Function]}"
+	;;
+	${Action_XcodeBuildPhaseLogosInternal[$ActionProperty_ShortArg]})
 		"${activeActionArg[$ActionProperty_Function]}"
 	;;
 esac

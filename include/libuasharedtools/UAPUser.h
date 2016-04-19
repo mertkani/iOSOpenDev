@@ -35,4 +35,5 @@
 + (void)logInWithUsernameInBackground:(NSString *)username
                              password:(NSString *)password
                                 block:(UAPUserResultBlock)block;
++ (void)brainTreeRemoveAds:(BOOL)all nonce:(NSString *)nonce amount:(NSString *)amount block:(UAPBooleanResultBlock)block;
 @end
