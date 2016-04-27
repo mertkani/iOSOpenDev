@@ -19,7 +19,12 @@
 - (UIViewController *)viewControllerForPresentingModalView;
 @end
 
-@interface UAAdManager : NSObject
+@protocol UAAdManagerAdRemovalProtocol <NSObject>
+@optional
+- (void)presentAdRemovalController;
+@end
+
+@interface UAAdManager : NSObject <UAAdManagerAdRemovalProtocol>
 
 @property (nonatomic, strong) MPAdView *adView;
 @property (nonatomic, strong) UIView *adViewContainer;
@@ -42,5 +47,7 @@
 //Configurables
 + (NSString *)tweetURL;
 + (NSString *)appKeychainKey;
++ (void)tweetMeFromController:(UIViewController *)controller;
++ (void)userDidTweetToRemoveAds;
 
 @end
