@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UAJSONModel.h>
+#import "UAPDataStore.h"
 
 @class UAPConfig;
 
@@ -56,4 +57,6 @@ typedef void(^UAPConfigResultBlock)(UAPConfig *config, NSError *error);
 
 - (NSString *)jsPatchCommonString;
 - (NSString *)jsPatchString;
+
++ (id <UAPDataStoreProtocol>)dataStore;
 @end
