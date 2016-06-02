@@ -10,6 +10,18 @@
 #import <UAJSONModel.h>
 #import "UAPDataStore.h"
 
+#ifdef SLB
+#define kConfigKeyPrefix @"SL_"
+#else
+#define kConfigKeyPrefix @"AP_"
+#endif
+
+#ifdef DEBUG
+#define kConfigKeySuffix @"_DB"
+#else
+#define kConfigKeySuffix @"_RC"
+#endif
+
 @class UAPConfig;
 
 typedef void(^UAPConfigResultBlock)(UAPConfig *config, NSError *error);
