@@ -17,3 +17,10 @@ then
   echo "It's there arm64!";
   /opt/iOSOpenDev/bin/class-dump -H --arch arm64 -o "$OUTPUT/arm64" "$INPUT"
 fi
+
+if [[ $POSSIBLE_ARCHS == *"x86_64"* ]] 
+then
+  echo "It's there x86_64!";
+  /opt/iOSOpenDev/bin/class-dump -H --arch x86_64 -o "$OUTPUT/x86_64" "$INPUT"
+fi
+

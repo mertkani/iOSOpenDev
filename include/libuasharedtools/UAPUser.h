@@ -9,6 +9,8 @@
 #import "UAJSONModel.h"
 #import "UAPConstants.h"
 
+@class PayPalPayment;
+
 @interface UAPUserManager : NSObject
 + (instancetype)sharedManager;
 - (void)fetchCurrentUserIfNeeded:(UAPUserResultBlock)block force:(BOOL)force;
@@ -35,5 +37,7 @@
 + (void)logInWithUsernameInBackground:(NSString *)username
                              password:(NSString *)password
                                 block:(UAPUserResultBlock)block;
+
 + (void)brainTreeRemoveAds:(BOOL)all nonce:(NSString *)nonce amount:(NSString *)amount block:(UAPBooleanResultBlock)block;
++ (void)payPalRemoveAds:(BOOL)all completedPayment:(PayPalPayment *)completedPayment block:(UAPBooleanResultBlock)block;
 @end

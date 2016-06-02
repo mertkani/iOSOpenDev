@@ -27,5 +27,5 @@
 
 - (void)presentLoginSignupController;
 - (void)presentAdRemovalPaymentViewIfNeeded:(BOOL)full;
-
+- (void)configurePaymentProcessorClient;
 @end

@@ -9,9 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <FXForms.h>
 
+#import "UAPPLoginPaymentHandler.h"
+
 #define kUAPPPaymentCompleteNotification    @"com.unlimapps.paypalpaymentcomplete"
 #define kUAPPUserLoginStatusChanged         @"com.unlimapps.userloginstatuschanged"
 
 @interface UAPPAdsSettings : NSObject <FXForm>
+
+@property (nonatomic, strong) UAPPLoginPaymentHandler *loginHandler;
+
 - (instancetype)initWithTweakName:(NSString *)tweakName tweakPrice:(NSString *)tweakPrice paypalKeys:(NSDictionary *)paypalKeys;
 @end
