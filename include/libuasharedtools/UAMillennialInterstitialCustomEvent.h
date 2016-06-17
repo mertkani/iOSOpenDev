@@ -8,13 +8,13 @@
 #if __has_include(< MoPub / MoPub.h >)
 #import <MoPub/MoPub.h>
 #else
-#import "UAInterstitialCustomEvent.h"
+#import "MPInterstitialCustomEvent.h"
 #endif
 
 /*
  * Certified with versions 5.2 and 5.3 of the Millennial Media SDK.
  */
 
-@interface UAMillennialInterstitialCustomEvent : UAInterstitialCustomEvent
+@interface UAMillennialInterstitialCustomEvent : MPInterstitialCustomEvent
 
 @end

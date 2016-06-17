@@ -8,13 +8,13 @@
 #if __has_include(< MoPub / MoPub.h >)
 #import <MoPub/MoPub.h>
 #else
-#import "UABannerCustomEvent.h"
+#import "MPBannerCustomEvent.h"
 #endif
 
 /*
  * Certified with version 6.12.2 of the Google AdMob Ads SDK.
  */
 
-@interface UAGoogleAdMobBannerCustomEvent : UABannerCustomEvent
+@interface UAGoogleAdMobBannerCustomEvent : MPBannerCustomEvent
 
 @end
