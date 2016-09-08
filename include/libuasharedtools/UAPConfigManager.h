@@ -17,7 +17,7 @@
 #endif
 
 #ifdef DEBUG
-#define kConfigKeySuffix @"_DB"
+#define kConfigKeySuffix @"_RC"
 #else
 #define kConfigKeySuffix @"_RC"
 #endif
